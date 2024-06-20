@@ -107,6 +107,6 @@ export default class DxfParser {
     registerEntityHandler(handlerType: new () => IGeometry): void;
     parseSync(source: string): IDxf | null;
     parseStream(stream: Readable): Promise<IDxf>;
-    private StringSplitter;
+    private _splitStringByNewline;
     private _parse;
 }
