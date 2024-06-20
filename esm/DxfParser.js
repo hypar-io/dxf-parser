@@ -84,10 +84,23 @@ export default class DxfParser {
             });
         });
     }
+    StringSplitter(str) {
+        const lines = [];
+        let currentIndex = 0;
+        let nextIndex;
+        while ((nextIndex = str.indexOf('\n', currentIndex)) !== -1) {
+            lines.push(str.substring(currentIndex, nextIndex));
+            currentIndex = nextIndex + 1;
+        }
+        if (currentIndex < str.length) {
+            lines.push(str.substring(currentIndex));
+        }
+        return lines;
+    }
     _parse(dxfString) {
         const dxf = {};
         let lastHandle = 0;
-        const dxfLinesArray = dxfString.split(/\r\n|\r|\n/g);
+        const dxfLinesArray = this.StringSplitter(dxfString);
         const scanner = new DxfArrayScanner(dxfLinesArray);
         if (!scanner.hasNext())
             throw Error('Empty file');
