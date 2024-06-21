@@ -1,3 +1,4 @@
+/// <reference types="node" />
 import { Readable } from 'stream';
 import IGeometry, { IEntity, IPoint } from './entities/geomtry.js';
 export interface IBlock {
@@ -106,5 +107,6 @@ export default class DxfParser {
     registerEntityHandler(handlerType: new () => IGeometry): void;
     parseSync(source: string): IDxf | null;
     parseStream(stream: Readable): Promise<IDxf>;
+    private _splitStringByNewline;
     private _parse;
 }

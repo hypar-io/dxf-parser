@@ -84,10 +84,34 @@ export default class DxfParser {
             });
         });
     }
+    _splitStringByNewline(str) {
+        const lines = [];
+        let currentIndex = 0;
+        let nextIndex;
+        // Split by \n
+        while ((nextIndex = str.indexOf('\n', currentIndex)) !== -1) {
+            let line = str.substring(currentIndex, nextIndex);
+            // Check if the line ends with a carriage return and remove it
+            if (line.endsWith('\r')) {
+                line = line.slice(0, -1); // Remove trailing \r if present (Windows-style)
+            }
+            lines.push(line);
+            currentIndex = nextIndex + 1;
+        }
+        if (currentIndex < str.length) {
+            let line = str.substring(currentIndex);
+            if (line.endsWith('\r')) {
+                line = line.slice(0, -1); // Remove trailing \r if present (Windows-style)
+            }
+            lines.push(line);
+        }
+        return lines;
+    }
+    ;
     _parse(dxfString) {
         const dxf = {};
         let lastHandle = 0;
-        const dxfLinesArray = dxfString.split(/\r\n|\r|\n/g);
+        const dxfLinesArray = this._splitStringByNewline(dxfString);
         const scanner = new DxfArrayScanner(dxfLinesArray);
         if (!scanner.hasNext())
             throw Error('Empty file');
