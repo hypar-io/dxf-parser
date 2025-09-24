@@ -7,6 +7,9 @@ export interface IEllipseEntity extends IEntity {
     startAngle: number;
     endAngle: number;
     name: string;
+    extrusionDirectionX: number;
+    extrusionDirectionY: number;
+    extrusionDirectionZ: number;
 }
 export default class Ellipse implements IGeometry {
     ForEntityName: "ELLIPSE";
