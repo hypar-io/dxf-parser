@@ -26,6 +26,15 @@ export default class Ellipse {
                 case 2:
                     entity.name = curr.value;
                     break;
+                case 210:
+                    entity.extrusionDirectionX = curr.value;
+                    break;
+                case 220:
+                    entity.extrusionDirectionY = curr.value;
+                    break;
+                case 230:
+                    entity.extrusionDirectionZ = curr.value;
+                    break;
                 default: // check common entity attributes
                     helpers.checkCommonEntityProperties(entity, curr, scanner);
                     break;
