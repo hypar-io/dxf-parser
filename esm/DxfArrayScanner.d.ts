@@ -38,3 +38,17 @@ export default class DxfArrayScanner {
      */
     isEOF(): boolean;
 }
+/**
+ * Reset the unrecognized group code counters.
+ * Call this before parsing a new DXF file if you want per-file warnings.
+ */
+export declare function resetUndefinedTypeWarnings(): void;
+/**
+ * Get the count of unrecognized group code warnings encountered.
+ */
+export declare function getUndefinedTypeWarningCount(): number;
+/**
+ * Log a summary of unrecognized group codes if any occurred.
+ * Call this after parsing to see a consolidated warning.
+ */
+export declare function logUndefinedTypeWarningSummary(): void;

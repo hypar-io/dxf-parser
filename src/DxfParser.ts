@@ -1,17 +1,17 @@
 import { Readable } from 'stream';
-import DxfArrayScanner, { IGroup } from './DxfArrayScanner.js';
 import AUTO_CAD_COLOR_INDEX from './AutoCadColorIndex.js';
+import DxfArrayScanner, { IGroup, logUndefinedTypeWarningSummary, resetUndefinedTypeWarnings } from './DxfArrayScanner.js';
 
 import Face from './entities/3dface.js';
 import Arc from './entities/arc.js';
 import AttDef from './entities/attdef.js';
 import Circle from './entities/circle.js';
 import Dimension from './entities/dimension.js';
-import MLeader from './entities/mleader.js';
 import Ellipse from './entities/ellipse.js';
 import Insert from './entities/insert.js';
 import Line from './entities/line.js';
 import LWPolyline from './entities/lwpolyline.js';
+import MLeader from './entities/mleader.js';
 import MText from './entities/mtext.js';
 import Point from './entities/point.js';
 import Polyline from './entities/polyline.js';
@@ -240,6 +240,9 @@ export default class DxfParser {
 	};
 
 	private _parse(dxfString: string) {
+		// Reset warning counters for this parse operation
+		resetUndefinedTypeWarnings();
+
 		const dxf = {} as IDxf;
 		let lastHandle = 0;
 		const dxfLinesArray = this._splitStringByNewline(dxfString);
@@ -867,8 +870,13 @@ export default class DxfParser {
 			if (!entity.handle) entity.handle = lastHandle++;
 		}
 
-		parseAll();
-		return dxf;
+		try {
+			parseAll();
+			return dxf;
+		} finally {
+			// Log consolidated warning summary if any undefined type warnings occurred
+			logUndefinedTypeWarningSummary();
+		}
 	}
 }
 
