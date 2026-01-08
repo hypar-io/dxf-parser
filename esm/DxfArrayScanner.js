@@ -79,6 +79,36 @@ export default class DxfArrayScanner {
         return this._eof;
     }
 }
+// Track unrecognized group codes to consolidate into a summary
+let unrecognizedGroupCodeCount = 0;
+let unrecognizedGroupCodes = [];
+let seenGroupCodeKeys = new Set();
+const MAX_UNIQUE_CODES = 100;
+/**
+ * Reset the unrecognized group code counters.
+ * Call this before parsing a new DXF file if you want per-file warnings.
+ */
+export function resetUndefinedTypeWarnings() {
+    unrecognizedGroupCodeCount = 0;
+    unrecognizedGroupCodes = [];
+    seenGroupCodeKeys.clear();
+}
+/**
+ * Get the count of unrecognized group code warnings encountered.
+ */
+export function getUndefinedTypeWarningCount() {
+    return unrecognizedGroupCodeCount;
+}
+/**
+ * Log a summary of unrecognized group codes if any occurred.
+ * Call this after parsing to see a consolidated warning.
+ */
+export function logUndefinedTypeWarningSummary() {
+    if (unrecognizedGroupCodeCount > 0) {
+        console.warn(`DXF Parser: Encountered ${unrecognizedGroupCodeCount} unrecognized group code(s). ` +
+            `Unique codes (${unrecognizedGroupCodes.length}): ${JSON.stringify(unrecognizedGroupCodes)}`);
+    }
+}
 /**
  * Parse a value to its proper type.
  * See pages 3 - 10 of the AutoCad DXF 2012 reference given at the top of this file
@@ -134,7 +164,13 @@ function parseGroupValue(code, value) {
         return parseFloat(value);
     if (code >= 1060 && code <= 1071)
         return parseInt(value);
-    console.log('WARNING: Group code does not have a defined type: %j', { code: code, value: value });
+    // Track the unrecognized code instead of logging each occurrence
+    unrecognizedGroupCodeCount++;
+    const key = `${code}:${value}`;
+    if (!seenGroupCodeKeys.has(key) && unrecognizedGroupCodes.length < MAX_UNIQUE_CODES) {
+        seenGroupCodeKeys.add(key);
+        unrecognizedGroupCodes.push({ code, value });
+    }
     return value;
 }
 /**
