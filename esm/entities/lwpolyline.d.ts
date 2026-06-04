@@ -4,6 +4,7 @@ export interface IVertex extends IPoint {
     startWidth: number;
     endWidth: number;
     bulge: number;
+    id?: number;
 }
 export interface ILwpolylineEntity extends IEntity {
     vertices: IVertex[];
