@@ -107,10 +107,30 @@ export interface ILayerTableDefinition {
 	parseTableRecords(): Record<string, ILayer>;
 }
 
+export interface ITextStyle {
+	name: string;
+	flags: number;
+	fixedTextHeight: number;
+	widthFactor: number;
+	obliqueAngle: number;
+	fontFileName: string;
+	bigFontFileName: string;
+	// ACAD XData (group 1071): packed TrueType pitch/family/charset + italic (bit 24) / bold (bit 25).
+	fontFlags?: number;
+}
+
+export interface IStyleTableDefinition {
+	tableRecordsProperty: 'styles';
+	tableName: 'style';
+	dxfSymbolName: 'STYLE';
+	parseTableRecords(): Record<string, ITextStyle>;
+}
+
 export interface ITableDefinitions {
 	VPORT: IViewPortTableDefinition;
 	LTYPE: ILineTypeTableDefinition;
 	LAYER: ILayerTableDefinition;
+	STYLE: IStyleTableDefinition;
 }
 
 export interface IBaseTable {
@@ -130,13 +150,18 @@ export interface ILayersTable extends IBaseTable {
 	layers: Record<string, ILayer>;
 }
 
+export interface IStyleTable extends IBaseTable {
+	styles: Record<string, ITextStyle>;
+}
+
 export interface ITables {
 	viewPort: IViewPortTable;
 	lineType: ILayerTypesTable;
 	layer: ILayersTable;
+	style: IStyleTable;
 }
 
-export type ITable = IViewPortTable | ILayerTypesTable | ILayersTable;
+export type ITable = IViewPortTable | ILayerTypesTable | ILayersTable | IStyleTable;
 
 export interface IDxf {
 	header: Record<string, IPoint | number>;
@@ -770,6 +795,70 @@ export default class DxfParser {
 			return layers;
 		}
 
+		function parseStyles() {
+			const styles = {} as Record<string, ITextStyle>;
+			let style = {} as ITextStyle;
+			let styleName: string | undefined;
+
+			log.debug('Style {');
+			curr = scanner.next();
+			while (!groupIs(curr, 0, 'ENDTAB')) {
+				switch (curr.code) {
+					case 2: // style name
+						style.name = curr.value as string;
+						styleName = curr.value as string;
+						curr = scanner.next();
+						break;
+					case 3: // primary font file name
+						style.fontFileName = curr.value as string;
+						curr = scanner.next();
+						break;
+					case 4: // bigfont file name
+						style.bigFontFileName = curr.value as string;
+						curr = scanner.next();
+						break;
+					case 40: // fixed text height
+						style.fixedTextHeight = curr.value as number;
+						curr = scanner.next();
+						break;
+					case 41: // width factor
+						style.widthFactor = curr.value as number;
+						curr = scanner.next();
+						break;
+					case 50: // oblique angle
+						style.obliqueAngle = curr.value as number;
+						curr = scanner.next();
+						break;
+					case 70: // flags
+						style.flags = curr.value as number;
+						curr = scanner.next();
+						break;
+					case 1071: // ACAD XData: TrueType font flags (italic/bold)
+						style.fontFlags = curr.value as number;
+						curr = scanner.next();
+						break;
+					case 0:
+						if (curr.value === 'STYLE') {
+							log.debug('}');
+							styles[styleName!] = style;
+							log.debug('Style {');
+							style = {} as ITextStyle;
+							styleName = undefined;
+							curr = scanner.next();
+						}
+						break;
+					default:
+						logUnhandledGroup(curr);
+						curr = scanner.next();
+						break;
+				}
+			}
+			log.debug('}');
+			styles[styleName!] = style;
+
+			return styles;
+		}
+
 		const tableDefinitions = {
 			VPORT: {
 				tableRecordsProperty: 'viewPorts',
@@ -788,6 +877,12 @@ export default class DxfParser {
 				tableName: 'layer',
 				dxfSymbolName: 'LAYER',
 				parseTableRecords: parseLayers
+			},
+			STYLE: {
+				tableRecordsProperty: 'styles',
+				tableName: 'style',
+				dxfSymbolName: 'STYLE',
+				parseTableRecords: parseStyles
 			}
 		} as ITableDefinitions;
 

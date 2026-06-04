@@ -11,6 +11,7 @@ export interface ITextEntity extends IEntity {
 	text: string;
 	halign: number;
 	valign: number;
+	styleName?: string;
 }
 
 export default class Text implements IGeometry {
@@ -38,6 +39,9 @@ export default class Text implements IGeometry {
 					break;
 				case 1: // Text
 					entity.text = curr.value as string;
+					break;
+				case 7: // text style name
+					entity.styleName = curr.value as string;
 					break;
 				// NOTE: 72 and 73 are meaningless without 11 (second alignment point)
 				case 72: // Horizontal alignment

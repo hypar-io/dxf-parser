@@ -9,6 +9,7 @@ export interface IMtextEntity extends IEntity {
     rotation: number;
     attachmentPoint: number;
     drawingDirection: number;
+    styleName?: string;
 }
 export default class Mtext implements IGeometry {
     ForEntityName: "MTEXT";

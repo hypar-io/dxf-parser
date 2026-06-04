@@ -9,6 +9,7 @@ export interface ITextEntity extends IEntity {
     text: string;
     halign: number;
     valign: number;
+    styleName?: string;
 }
 export default class Text implements IGeometry {
     ForEntityName: "TEXT";
