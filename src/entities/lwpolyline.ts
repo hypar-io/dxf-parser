@@ -6,6 +6,7 @@ export interface IVertex extends IPoint{
 	startWidth: number;
 	endWidth: number;
 	bulge: number;
+	id?: number;
 }
 
 export interface ILwpolylineEntity extends IEntity {
@@ -103,6 +104,9 @@ function parseLWPolylineVertices(n:number, scanner: DxfArrayScanner) {
 					break;
 				case 42: // bulge
 					if (curr.value != 0) vertex.bulge = curr.value as number;
+					break;
+				case 91: // vertex identifier (AcDbPolyline, R2010+)
+					vertex.id = curr.value as number;
 					break;
 				default:
 					// if we do not hit known code return vertices.  Code might belong to entity

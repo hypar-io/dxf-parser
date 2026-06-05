@@ -84,6 +84,9 @@ function parseLWPolylineVertices(n, scanner) {
                     if (curr.value != 0)
                         vertex.bulge = curr.value;
                     break;
+                case 91: // vertex identifier (AcDbPolyline, R2010+)
+                    vertex.id = curr.value;
+                    break;
                 default:
                     // if we do not hit known code return vertices.  Code might belong to entity
                     scanner.rewind();
