@@ -11,6 +11,7 @@ export interface IMtextEntity extends IEntity {
 	rotation: number;
 	attachmentPoint: number;
 	drawingDirection: number;
+	styleName?: string;
 }
 
 export default class Mtext implements IGeometry {
@@ -27,6 +28,9 @@ export default class Mtext implements IGeometry {
 					break;
 				case 1:
 					entity.text ? entity.text += curr.value : entity.text = curr.value as string;
+					break;
+				case 7:
+					entity.styleName = curr.value as string;
 					break;
 				case 10:
 					entity.position = helpers.parsePoint(scanner);

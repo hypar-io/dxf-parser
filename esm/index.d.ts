@@ -1,5 +1,5 @@
 export { getUndefinedTypeWarningCount, logUndefinedTypeWarningSummary, resetUndefinedTypeWarnings } from './DxfArrayScanner.js';
-export { default, default as DxfParser, IBaseTable, IBlock, IDxf, ILayer, ILayersTable, ILayerTableDefinition, ILayerTypesTable, ILineType, ILineTypeTableDefinition, ITable, ITableDefinitions, ITables, IViewPort, IViewPortTable, IViewPortTableDefinition } from './DxfParser.js';
+export { default, default as DxfParser, IBaseTable, IBlock, IDxf, ILayer, ILayersTable, ILayerTableDefinition, ILayerTypesTable, ILineType, ILineTypeTableDefinition, IStyleTable, IStyleTableDefinition, ITable, ITableDefinitions, ITables, ITextStyle, IViewPort, IViewPortTable, IViewPortTableDefinition } from './DxfParser.js';
 export { I3DfaceEntity } from './entities/3dface.js';
 export { IArcEntity } from './entities/arc.js';
 export { IAttdefEntity } from './entities/attdef.js';

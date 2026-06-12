@@ -70,10 +70,27 @@ export interface ILayerTableDefinition {
     dxfSymbolName: 'LAYER';
     parseTableRecords(): Record<string, ILayer>;
 }
+export interface ITextStyle {
+    name: string;
+    flags: number;
+    fixedTextHeight: number;
+    widthFactor: number;
+    obliqueAngle: number;
+    fontFileName: string;
+    bigFontFileName: string;
+    fontFlags?: number;
+}
+export interface IStyleTableDefinition {
+    tableRecordsProperty: 'styles';
+    tableName: 'style';
+    dxfSymbolName: 'STYLE';
+    parseTableRecords(): Record<string, ITextStyle>;
+}
 export interface ITableDefinitions {
     VPORT: IViewPortTableDefinition;
     LTYPE: ILineTypeTableDefinition;
     LAYER: ILayerTableDefinition;
+    STYLE: IStyleTableDefinition;
 }
 export interface IBaseTable {
     handle: string;
@@ -88,12 +105,16 @@ export interface ILayerTypesTable extends IBaseTable {
 export interface ILayersTable extends IBaseTable {
     layers: Record<string, ILayer>;
 }
+export interface IStyleTable extends IBaseTable {
+    styles: Record<string, ITextStyle>;
+}
 export interface ITables {
     viewPort: IViewPortTable;
     lineType: ILayerTypesTable;
     layer: ILayersTable;
+    style: IStyleTable;
 }
-export type ITable = IViewPortTable | ILayerTypesTable | ILayersTable;
+export type ITable = IViewPortTable | ILayerTypesTable | ILayersTable | IStyleTable;
 export interface IDxf {
     header: Record<string, IPoint | number>;
     entities: IEntity[];

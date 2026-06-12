@@ -14,6 +14,9 @@ export default class Mtext {
                 case 1:
                     entity.text ? entity.text += curr.value : entity.text = curr.value;
                     break;
+                case 7:
+                    entity.styleName = curr.value;
+                    break;
                 case 10:
                     entity.position = helpers.parsePoint(scanner);
                     break;

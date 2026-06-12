@@ -625,6 +625,67 @@ export default class DxfParser {
             layers[layerName] = layer;
             return layers;
         }
+        function parseStyles() {
+            const styles = {};
+            let style = {};
+            let styleName;
+            log.debug('Style {');
+            curr = scanner.next();
+            while (!groupIs(curr, 0, 'ENDTAB')) {
+                switch (curr.code) {
+                    case 2: // style name
+                        style.name = curr.value;
+                        styleName = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 3: // primary font file name
+                        style.fontFileName = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 4: // bigfont file name
+                        style.bigFontFileName = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 40: // fixed text height
+                        style.fixedTextHeight = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 41: // width factor
+                        style.widthFactor = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 50: // oblique angle
+                        style.obliqueAngle = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 70: // flags
+                        style.flags = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 1071: // ACAD XData: TrueType font flags (italic/bold)
+                        style.fontFlags = curr.value;
+                        curr = scanner.next();
+                        break;
+                    case 0:
+                        if (curr.value === 'STYLE') {
+                            log.debug('}');
+                            styles[styleName] = style;
+                            log.debug('Style {');
+                            style = {};
+                            styleName = undefined;
+                            curr = scanner.next();
+                        }
+                        break;
+                    default:
+                        logUnhandledGroup(curr);
+                        curr = scanner.next();
+                        break;
+                }
+            }
+            log.debug('}');
+            styles[styleName] = style;
+            return styles;
+        }
         const tableDefinitions = {
             VPORT: {
                 tableRecordsProperty: 'viewPorts',
@@ -643,6 +704,12 @@ export default class DxfParser {
                 tableName: 'layer',
                 dxfSymbolName: 'LAYER',
                 parseTableRecords: parseLayers
+            },
+            STYLE: {
+                tableRecordsProperty: 'styles',
+                tableName: 'style',
+                dxfSymbolName: 'STYLE',
+                parseTableRecords: parseStyles
             }
         };
         /**
